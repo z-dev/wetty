@@ -1,6 +1,6 @@
 import { spawn } from 'node-pty';
 import { isUndefined } from 'lodash';
-import events from './emitter';
+import logger from './logger';
 
 const xterm = {
   name: 'xterm-256color',
@@ -13,11 +13,15 @@ const xterm = {
 export default class Term {
   public static spawn(socket: SocketIO.Socket, args: string[]): void {
     const term = spawn('/usr/bin/env', args, xterm);
+    const { pid } = term;
     const address = args[0] === 'ssh' ? args[1] : 'localhost';
-    events.spawned(term.pid, address);
+    logger.info('Process Started on behalf of user', {
+      pid,
+      address,
+    });
     socket.emit('login');
     term.on('exit', code => {
-      events.exited(code, term.pid);
+      logger.info('Process exited', { code, pid });
       socket.emit('logout');
       socket
         .removeAllListeners('disconnect')
@@ -35,9 +39,8 @@ export default class Term {
         if (!isUndefined(term)) term.write(input);
       })
       .on('disconnect', () => {
-        const { pid } = term;
         term.kill();
-        events.exited(0, pid);
+        logger.info('Process exited', { code: 0, pid });
       });
   }
 

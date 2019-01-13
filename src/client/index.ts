@@ -1,5 +1,5 @@
 import { Terminal } from 'xterm';
-import { isUndefined } from 'lodash';
+import { isUndefined, isNull } from 'lodash';
 import * as io from 'socket.io-client';
 import { fit } from 'xterm/lib/addons/fit/fit';
 import './wetty.scss';
@@ -12,11 +12,15 @@ const socket = io(window.location.origin, {
   path: `${trim(socketBase)}/socket.io`,
 });
 
+const overlay = document.getElementById('overlay');
+const terminal = document.getElementById('terminal');
+
 socket.on('connect', () => {
   const term = new Terminal();
-  term.open(document.getElementById('terminal'));
+  if (isNull(terminal)) return;
+  term.open(terminal);
   term.setOption('fontSize', 14);
-  document.getElementById('overlay').style.display = 'none';
+  if (!isNull(overlay)) overlay.style.display = 'none';
   window.addEventListener('beforeunload', handler, false);
   /*
     term.scrollPort_.screen_.setAttribute('contenteditable', 'false');
@@ -66,8 +70,10 @@ socket.on('connect', () => {
 });
 
 function disconnect(reason: string): void {
-  document.getElementById('overlay').style.display = 'block';
-  if (!isUndefined(reason)) document.getElementById('msg').innerHTML = reason;
+  if (isNull(overlay)) return;
+  overlay.style.display = 'block';
+  const msg = document.getElementById('msg');
+  if (!isUndefined(reason) && !isNull(msg)) msg.innerHTML = reason;
   window.removeEventListener('beforeunload', handler, false);
 }
 

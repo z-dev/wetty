@@ -9,7 +9,6 @@ import * as socket from 'socket.io';
 import { isUndefined } from 'lodash';
 import * as morgan from 'morgan';
 import logger from './logger';
-import events from './emitter';
 import { SSLBuffer, Server } from './interfaces';
 
 const distDir = path.join(__dirname, 'client');
@@ -21,10 +20,12 @@ export default function createServer(
   { key, cert }: SSLBuffer
 ): SocketIO.Server {
   const basePath = trim(base);
-  events.emit(
-    'debug',
-    `key: ${key}, cert: ${cert}, port: ${port}, base: ${base}`
-  );
+  logger.info('Starting server', {
+    key,
+    cert,
+    port,
+    base,
+  });
 
   const html = (
     req: express.Request,
@@ -73,10 +74,16 @@ export default function createServer(
   return socket(
     !isUndefined(key) && !isUndefined(cert)
       ? https.createServer({ key, cert }, app).listen(port, host, () => {
-          events.server(port, 'https');
+          logger.info('Server started', {
+            port,
+            connection: 'https',
+          });
         })
       : http.createServer(app).listen(port, host, () => {
-          events.server(port, 'http');
+          logger.info('Server started', {
+            port,
+            connection: 'http',
+          });
         }),
     { path: `${basePath}/socket.io` }
   );

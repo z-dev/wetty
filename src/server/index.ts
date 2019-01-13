@@ -1,9 +1,8 @@
 import * as yargs from 'yargs';
 import logger from './logger';
-import wetty from './emitter';
 import WeTTy from './wetty';
 
-export interface Options {
+interface Options {
   sshhost: string;
   sshport: number;
   sshuser: string;
@@ -37,18 +36,7 @@ export default class Server {
     sslkey,
     sslcert,
   }: Options): Promise<void> {
-    wetty
-      .on('exit', ({ code, msg }: { code: number; msg: string }) => {
-        logger.info(`Exit with code: ${code} ${msg}`);
-      })
-      .on('disconnect', () => {
-        logger.info('disconnect');
-      })
-      .on('spawn', ({ msg }) => logger.info(msg))
-      .on('connection', ({ msg, date }) => logger.info(`${date} ${msg}`))
-      .on('server', ({ msg }) => logger.info(msg))
-      .on('debug', (msg: string) => logger.debug(msg));
-    return wetty.start(
+    return WeTTy.start(
       {
         user: sshuser,
         host: sshhost,
@@ -64,7 +52,7 @@ export default class Server {
   }
 
   public static get wetty(): WeTTy {
-    return wetty;
+    return WeTTy;
   }
 
   public static init(opts: CLI): void {

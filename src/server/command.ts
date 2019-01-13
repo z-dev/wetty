@@ -1,5 +1,6 @@
 import * as url from 'url';
 import { Socket } from 'socket.io';
+import { isUndefined } from 'lodash';
 import { SSH } from './interfaces';
 
 const localhost = (host: string): boolean =>
@@ -35,7 +36,7 @@ export default (
         urlArgs(referer, {
           host: address(referer, user, host),
           port: `${port}`,
-          pass,
+          pass: pass || '',
           command,
           auth,
         }),
@@ -69,10 +70,10 @@ function sshOptions(
     '-o',
     `PreferredAuthentications=${auth}`,
   ];
-  if (key) {
+  if (!isUndefined(key)) {
     return sshRemoteOptsBase.concat(['-i', key, cmd]);
   }
-  if (pass) {
+  if (pass !== '') {
     return ['sshpass', '-p', pass].concat(sshRemoteOptsBase, [cmd]);
   }
   if (cmd === '') {
