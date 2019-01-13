@@ -1,13 +1,18 @@
-import { spawn } from 'node-pty';
+import { spawn, IPtyForkOptions } from 'node-pty';
 import { isUndefined } from 'lodash';
 import logger from './logger';
 
-const xterm = {
+const xterm: IPtyForkOptions = {
   name: 'xterm-256color',
   cols: 80,
   rows: 30,
   cwd: process.cwd(),
-  env: process.env,
+  env: Object.assign(
+    {},
+    ...Object.keys(process.env)
+      .filter((key: string) => !isUndefined(process.env[key]))
+      .map((key: string) => ({ [key]: process.env[key] }))
+  ),
 };
 
 export default class Term {
