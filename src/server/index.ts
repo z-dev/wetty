@@ -1,6 +1,8 @@
+import { isUndefined } from 'lodash';
 import * as yargs from 'yargs';
 import logger from './logger';
 import WeTTy from './wetty';
+import { Server as ServerInt, SSH, SSL } from './interfaces';
 
 interface Options {
   sshhost: string;
@@ -22,33 +24,34 @@ interface CLI extends Options {
 }
 
 export default class Server {
-  public static start({
-    sshuser,
-    sshhost,
-    sshauth,
-    sshport,
-    sshkey,
-    sshpass,
-    base,
-    host,
-    port,
-    command,
-    sslkey,
-    sslcert,
-  }: Options): Promise<void> {
-    return WeTTy.start(
-      {
-        user: sshuser,
-        host: sshhost,
-        auth: sshauth,
-        port: sshport,
-        pass: sshpass,
-        key: sshkey,
+  private static unWrapArgs(
+    args: Options
+  ): { ssh: SSH; server: ServerInt; command?: string; ssl?: SSL } {
+    return {
+      ssh: {
+        user: args.sshuser,
+        host: args.sshhost,
+        auth: args.sshauth,
+        port: args.sshport,
+        pass: args.sshpass,
+        key: args.sshkey,
       },
-      { base, host, port },
-      command,
-      { key: sslkey, cert: sslcert }
-    );
+      server: {
+        base: args.base,
+        host: args.host,
+        port: args.port,
+      },
+      command: args.command,
+      ssl:
+        isUndefined(args.sslkey) || isUndefined(args.sslcert)
+          ? undefined
+          : { key: args.sslkey, cert: args.sslcert },
+    };
+  }
+
+  public static start(args: Options): Promise<void> {
+    const { ssh, server, command, ssl } = this.unWrapArgs(args);
+    return WeTTy.start(ssh, server, command, ssl);
   }
 
   public static get wetty(): WeTTy {

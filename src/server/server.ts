@@ -59,15 +59,6 @@ export default function createServer(
     .use(compression())
     .use(favicon(path.join(distDir, 'favicon.ico')))
     .use(`${basePath}/public`, express.static(distDir))
-    .use((req, res, next) => {
-      if (
-        req.url.substr(-1) === '/' &&
-        req.url.length > 1 &&
-        !/\?[^]*\//.test(req.url)
-      )
-        res.redirect(301, req.url.slice(0, -1));
-      else next();
-    })
     .get(basePath, html)
     .get(`${basePath}/ssh/:user`, html);
 

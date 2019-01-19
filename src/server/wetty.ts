@@ -16,7 +16,11 @@ export default class WeTTy {
    */
   public static start(
     ssh: SSH = { user: '', host: 'localhost', auth: 'password', port: 22 },
-    serverConf: Server = { base: '/wetty/', port: 3000, host: '0.0.0.0' },
+    serverConf: Server = {
+      base: '/wetty/',
+      port: 3000,
+      host: '0.0.0.0',
+    },
     command: string = '',
     ssl?: SSL
   ): Promise<void> {
