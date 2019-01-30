@@ -1,12 +1,13 @@
 import { spawn } from 'node-pty';
 import { isUndefined } from 'lodash';
+import os from 'os';
 import events from './emitter';
 
 const xterm = {
   name: 'xterm-256color',
   cols: 80,
   rows: 30,
-  cwd: process.cwd(),
+  cwd: os.homedir(),
   env: process.env,
 };
 
