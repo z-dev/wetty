@@ -238,8 +238,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var lodash_isUndefined__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash_isUndefined__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var node_pty__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! node-pty */ "node-pty");
 /* harmony import */ var node_pty__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_pty__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _emitter__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./emitter */ "./src/server/emitter.ts");
-const xterm={name:'xterm-256color',cols:80,rows:30,cwd:process.cwd(),env:process.env};class Term{static spawn(socket,args){const term=Object(node_pty__WEBPACK_IMPORTED_MODULE_1__["spawn"])('/bin/bash',[],xterm);const address=args[0]==='ssh'?args[1]:'localhost';_emitter__WEBPACK_IMPORTED_MODULE_2__["default"].spawned(term.pid,address);socket.emit('login');term.on('exit',code=>{_emitter__WEBPACK_IMPORTED_MODULE_2__["default"].exited(code,term.pid);socket.emit('logout');socket.removeAllListeners('disconnect').removeAllListeners('resize').removeAllListeners('input');});term.on('data',data=>{socket.emit('data',data);});socket.on('resize',({cols,rows})=>{term.resize(cols,rows);}).on('input',input=>{if(!lodash_isUndefined__WEBPACK_IMPORTED_MODULE_0___default()(term))term.write(input);}).on('disconnect',()=>{const{pid}=term;term.kill();_emitter__WEBPACK_IMPORTED_MODULE_2__["default"].exited(0,pid);});}static login(socket){const term=Object(node_pty__WEBPACK_IMPORTED_MODULE_1__["spawn"])('/usr/bin/env',['node',`${__dirname}/buffer.js`],xterm);let buf='';return new Promise((resolve,reject)=>{term.on('exit',()=>{resolve(buf);});term.on('data',data=>{socket.emit('data',data);});socket.on('input',input=>{term.write(input);buf=/\177/.exec(input)?buf.slice(0,-1):buf+input;}).on('disconnect',()=>{term.kill();reject();});});}}
+/* harmony import */ var os__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! os */ "os");
+/* harmony import */ var os__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(os__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _emitter__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./emitter */ "./src/server/emitter.ts");
+const xterm={name:'xterm-256color',cols:80,rows:30,cwd:os__WEBPACK_IMPORTED_MODULE_2___default.a.homedir(),env:process.env};console.log(xterm);class Term{static spawn(socket,args){const term=Object(node_pty__WEBPACK_IMPORTED_MODULE_1__["spawn"])('/bin/bash',[],xterm);const address=args[0]==='ssh'?args[1]:'localhost';_emitter__WEBPACK_IMPORTED_MODULE_3__["default"].spawned(term.pid,address);socket.emit('login');term.on('exit',code=>{_emitter__WEBPACK_IMPORTED_MODULE_3__["default"].exited(code,term.pid);socket.emit('logout');socket.removeAllListeners('disconnect').removeAllListeners('resize').removeAllListeners('input');});term.on('data',data=>{socket.emit('data',data);});socket.on('resize',({cols,rows})=>{term.resize(cols,rows);}).on('input',input=>{if(!lodash_isUndefined__WEBPACK_IMPORTED_MODULE_0___default()(term))term.write(input);}).on('disconnect',()=>{const{pid}=term;term.kill();_emitter__WEBPACK_IMPORTED_MODULE_3__["default"].exited(0,pid);});}static login(socket){const term=Object(node_pty__WEBPACK_IMPORTED_MODULE_1__["spawn"])('/usr/bin/env',['node',`${__dirname}/buffer.js`],xterm);let buf='';return new Promise((resolve,reject)=>{term.on('exit',()=>{resolve(buf);});term.on('data',data=>{socket.emit('data',data);});socket.on('input',input=>{term.write(input);buf=/\177/.exec(input)?buf.slice(0,-1):buf+input;}).on('disconnect',()=>{term.kill();reject();});});}}
 
 /***/ }),
 
@@ -417,6 +419,17 @@ module.exports = require("morgan");
 /***/ (function(module, exports) {
 
 module.exports = require("node-pty");
+
+/***/ }),
+
+/***/ "os":
+/*!*********************!*\
+  !*** external "os" ***!
+  \*********************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("os");
 
 /***/ }),
 
